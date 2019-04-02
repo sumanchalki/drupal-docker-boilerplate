@@ -1,0 +1,1 @@
+This directory will map to the volume for Drupal App Data.
