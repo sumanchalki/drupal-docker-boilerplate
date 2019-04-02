@@ -1,0 +1,7 @@
+version: '3'
+drupal:
+  extends:
+    file: docker-compose.yml
+    service: drupal
+  ports:
+    - '8000:80'

@@ -2,20 +2,55 @@ version: '3'
 services:
   db:
     image: mysql:5.7
+    container_name: drupal_db_boilerplate
     environment:
-      MYSQL_DATABASE: drupal
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
     volumes:
       - db_data:/var/lib/mysql
     restart: always
-  drupal:
+    ports:
+      - "3306:3306"
+    networks:
+      - back-tier
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: drupal_phpmyadmin_boilerplate
     depends_on:
-      - db
+     - db
+    environment:
+      PMA_HOST: $DB_HOST
+      PMA_USER: root
+      PMA_PASSWORD: $DB_ROOT_PASSWORD
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    ports:
+      - '80:80'
+    networks:
+      - front-tier
+      - back-tier
+
+  drupal:
+    container_name: drupal_app_boilerplate
+    depends_on:
+     - db
     build: .
     ports:
-      - "8080:80"
+      - "8080:8081"
     volumes:
       - ./app:/app
     restart: always
+    networks:
+      - front-tier
+      - back-tier
+
 volumes:
   db_data:
+  app:
+
+networks:
+  front-tier:
+  back-tier:
